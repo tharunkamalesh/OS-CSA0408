@@ -1,0 +1,17 @@
+import os
+from multiprocessing import Process
+
+def child_process():
+    print("\n--- Child Process ---")
+    print(f"Child PID      : {os.getpid()}")
+    print(f"Parent PID (PPID) : {os.getppid()}")
+
+if __name__ == "__main__":
+    print("\n--- Parent Process ---")
+    print(f"Parent PID     : {os.getpid()}")
+
+    # Create child process
+    p = Process(target=child_process)
+    p.start()
+    print(f"Child PID      : {p.pid}")
+    p.join()
