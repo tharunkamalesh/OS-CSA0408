@@ -1,0 +1,23 @@
+import os
+
+def copy_file(source_file, dest_file):
+    # Open source file for reading
+    src_fd = os.open(source_file, os.O_RDONLY)
+    
+    # Open destination file for writing (create if not exists)
+    dest_fd = os.open(dest_file, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o644)
+    
+    # Read content from source and write to destination
+    while True:
+        data = os.read(src_fd, 1024)  # read in chunks of 1024 bytes
+        if not data:
+            break
+        os.write(dest_fd, data)
+    
+    # Close both files
+    os.close(src_fd)
+    os.close(dest_fd)
+    print(f"File copied from '{source_file}' to '{dest_file}' successfully!")
+
+# Example usage
+copy_file("source.txt", "destination.txt")
