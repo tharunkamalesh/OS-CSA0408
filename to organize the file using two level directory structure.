@@ -1,0 +1,139 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+#define MAX_USERS 10
+#define MAX_FILES 10
+#define MAX_NAME 20
+
+typedef struct {
+    char filename[MAX_NAME];
+} File;
+
+typedef struct {
+    char username[MAX_NAME];
+    File files[MAX_FILES];
+    int file_count;
+} UserDir;
+
+UserDir users[MAX_USERS];
+int user_count = 0;
+
+void create_user() {
+    if (user_count >= MAX_USERS) {
+        printf("Error: Maximum users reached.\n");
+        return;
+    }
+    char name[MAX_NAME];
+    printf("Enter username: ");
+    scanf("%s", name);
+
+    // Check if user exists
+    for (int i = 0; i < user_count; i++) {
+        if (strcmp(users[i].username, name) == 0) {
+            printf("Error: User already exists.\n");
+            return;
+        }
+    }
+
+    strcpy(users[user_count].username, name);
+    users[user_count].file_count = 0;
+    user_count++;
+    printf("User '%s' created successfully.\n", name);
+}
+
+int find_user(char* username) {
+    for (int i = 0; i < user_count; i++) {
+        if (strcmp(users[i].username, username) == 0)
+            return i;
+    }
+    return -1;
+}
+
+void create_file() {
+    char username[MAX_NAME], filename[MAX_NAME];
+    printf("Enter username: ");
+    scanf("%s", username);
+
+    int idx = find_user(username);
+    if (idx == -1) {
+        printf("Error: User not found.\n");
+        return;
+    }
+
+    if (users[idx].file_count >= MAX_FILES) {
+        printf("Error: Maximum files reached for user.\n");
+        return;
+    }
+
+    printf("Enter file name: ");
+    scanf("%s", filename);
+
+    // Check if file exists
+    for (int i = 0; i < users[idx].file_count; i++) {
+        if (strcmp(users[idx].files[i].filename, filename) == 0) {
+            printf("Error: File already exists.\n");
+            return;
+        }
+    }
+
+    strcpy(users[idx].files[users[idx].file_count].filename, filename);
+    users[idx].file_count++;
+    printf("File '%s' created under user '%s'.\n", filename, username);
+}
+
+void delete_file() {
+    char username[MAX_NAME], filename[MAX_NAME];
+    printf("Enter username: ");
+    scanf("%s", username);
+
+    int idx = find_user(username);
+    if (idx == -1) {
+        printf("Error: User not found.\n");
+        return;
+    }
+
+    printf("Enter file name to delete: ");
+    scanf("%s", filename);
+
+    int found = -1;
+    for (int i = 0; i < users[idx].file_count; i++) {
+        if (strcmp(users[idx].files[i].filename, filename) == 0) {
+            found = i;
+            break;
+        }
+    }
+
+    if (found == -1) {
+        printf("Error: File not found.\n");
+        return;
+    }
+
+    // Shift files
+    for (int i = found; i < users[idx].file_count - 1; i++) {
+        strcpy(users[idx].files[i].filename, users[idx].files[i + 1].filename);
+    }
+    users[idx].file_count--;
+    printf("File '%s' deleted from user '%s'.\n", filename, username);
+}
+
+void search_file() {
+    char username[MAX_NAME], filename[MAX_NAME];
+    printf("Enter username: ");
+    scanf("%s", username);
+
+    int idx = find_user(username);
+    if (idx == -1) {
+        printf("Error: User not found.\n");
+        return;
+    }
+
+    printf("Enter file name to search: ");
+    scanf("%s", filename);
+
+    for (int i = 0; i < users[idx].file_count; i++) {
+        if (strcmp(users[idx].files[i].filename, filename) == 0) {
+            printf("File '%s' exists under user '%s'.\n", filename, username);
+            return;
+        }
+    }
