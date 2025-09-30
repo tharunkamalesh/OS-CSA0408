@@ -1,0 +1,32 @@
+from multiprocessing import Process, Queue
+import time
+
+def sender(q):
+    messages = [
+        "Hello from Process 1",
+        "This is a message queue IPC example",
+        "End"
+    ]
+    for msg in messages:
+        print("Sender: Sending ->", msg)
+        q.put(msg)  # Put message into queue
+        time.sleep(1)
+
+def receiver(q):
+    while True:
+        msg = q.get()  # Get message from queue
+        print("Receiver: Received ->", msg)
+        if msg == "End":
+            break
+
+if __name__ == "__main__":
+    q = Queue()  # Create a message queue
+
+    p1 = Process(target=sender, args=(q,))
+    p2 = Process(target=receiver, args=(q,))
+
+    p1.start()
+    p2.start()
+
+    p1.join()
+    p2.join()
