@@ -1,0 +1,20 @@
+def worst_fit(memory_blocks, process_sizes):
+    allocation = [-1] * len(process_sizes)
+    blocks = memory_blocks.copy()
+
+    for i, size in enumerate(process_sizes):
+        worst_idx = -1
+        for j, block in enumerate(blocks):
+            if block >= size:
+                if worst_idx == -1 or block > blocks[worst_idx]:
+                    worst_idx = j
+        if worst_idx != -1:
+            allocation[i] = worst_idx
+            blocks[worst_idx] -= size
+    return allocation
+
+memory_blocks = [100, 500, 200, 300, 600]
+process_sizes = [212, 417, 112, 426]
+
+allocation = worst_fit(memory_blocks, process_sizes)
+print("Worst Fit Allocation:", allocation)
