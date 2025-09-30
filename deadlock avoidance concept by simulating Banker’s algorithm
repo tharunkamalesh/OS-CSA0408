@@ -1,0 +1,57 @@
+def calculate_need(max_matrix, alloc_matrix):
+    """Calculate the Need matrix = Max - Allocation"""
+    need = []
+    for i in range(len(max_matrix)):
+        need.append([max_matrix[i][j] - alloc_matrix[i][j] for j in range(len(max_matrix[0]))])
+    return need
+
+def is_safe_state(available, max_matrix, alloc_matrix):
+    need = calculate_need(max_matrix, alloc_matrix)
+    n = len(max_matrix)
+    m = len(available)
+    
+    work = available.copy()
+    finish = [False] * n
+    safe_seq = []
+
+    while len(safe_seq) < n:
+        allocated_in_this_round = False
+        for i in range(n):
+            if not finish[i] and all(need[i][j] <= work[j] for j in range(m)):
+                # Can satisfy this process
+                for j in range(m):
+                    work[j] += alloc_matrix[i][j]
+                finish[i] = True
+                safe_seq.append(i)
+                allocated_in_this_round = True
+        if not allocated_in_this_round:
+            break  # No further allocation possible
+
+    if len(safe_seq) == n:
+        return True, safe_seq
+    else:
+        return False, []
+
+def bankers_algorithm():
+    n = int(input("Enter number of processes: "))
+    m = int(input("Enter number of resources: "))
+
+    print("Enter Allocation Matrix:")
+    alloc_matrix = [list(map(int, input(f"Process {i}: ").split())) for i in range(n)]
+
+    print("Enter Maximum Matrix:")
+    max_matrix = [list(map(int, input(f"Process {i}: ").split())) for i in range(n)]
+
+    available = list(map(int, input("Enter Available Resources: ").split()))
+
+    print("\nCalculating safe state...")
+    safe, sequence = is_safe_state(available, max_matrix, alloc_matrix)
+
+    if safe:
+        print("System is in a SAFE state.")
+        print("Safe sequence of processes:", ' -> '.join([f"P{i}" for i in sequence]))
+    else:
+        print("System is in an UNSAFE state. Deadlock may occur!")
+
+if __name__ == "__main__":
+    bankers_algorithm()
