@@ -1,0 +1,41 @@
+from multiprocessing import Process, shared_memory
+import time
+
+def writer():
+    # Create shared memory block
+    shm = shared_memory.SharedMemory(create=True, size=1024, name="shm_demo")
+
+    # Write data into shared memory
+    message = b"Hello from Shared Memory IPC!"
+    shm.buf[:len(message)] = message
+    print("Parent (Writer): Data written to shared memory.")
+
+    # Keep memory alive for reader
+    time.sleep(3)
+
+    # Close and unlink shared memory
+    shm.close()
+    shm.unlink()
+
+def reader():
+    time.sleep(1)  # Wait for writer to create memory
+
+    # Attach to existing shared memory
+    shm = shared_memory.SharedMemory(name="shm_demo")
+
+    # Read data
+    data = bytes(shm.buf[:30]).decode("utf-8").rstrip("\x00")
+    print("Child (Reader): Data read from shared memory:", data)
+
+    # Close shared memory
+    shm.close()
+
+if __name__ == "__main__":
+    p1 = Process(target=writer)
+    p2 = Process(target=reader)
+
+    p1.start()
+    p2.start()
+
+    p1.join()
+    p2.join()
