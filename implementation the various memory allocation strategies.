@@ -1,0 +1,65 @@
+def first_fit(memory_blocks, process_sizes):
+    allocation = [-1] * len(process_sizes)
+    blocks = memory_blocks.copy()
+
+    for i, size in enumerate(process_sizes):
+        for j, block in enumerate(blocks):
+            if block >= size:
+                allocation[i] = j
+                blocks[j] -= size
+                break
+    return allocation
+
+def best_fit(memory_blocks, process_sizes):
+    allocation = [-1] * len(process_sizes)
+    blocks = memory_blocks.copy()
+
+    for i, size in enumerate(process_sizes):
+        best_idx = -1
+        for j, block in enumerate(blocks):
+            if block >= size:
+                if best_idx == -1 or block < blocks[best_idx]:
+                    best_idx = j
+        if best_idx != -1:
+            allocation[i] = best_idx
+            blocks[best_idx] -= size
+    return allocation
+
+def worst_fit(memory_blocks, process_sizes):
+    allocation = [-1] * len(process_sizes)
+    blocks = memory_blocks.copy()
+
+    for i, size in enumerate(process_sizes):
+        worst_idx = -1
+        for j, block in enumerate(blocks):
+            if block >= size:
+                if worst_idx == -1 or block > blocks[worst_idx]:
+                    worst_idx = j
+        if worst_idx != -1:
+            allocation[i] = worst_idx
+            blocks[worst_idx] -= size
+    return allocation
+
+def print_allocation(strategy_name, allocation, process_sizes, memory_blocks):
+    print(f"\n{strategy_name} Allocation:")
+    print("Process\tSize\tBlock Allocated")
+    for i, block in enumerate(allocation):
+        if block != -1:
+            print(f"P{i+1}\t{process_sizes[i]}\t{block} (Remaining: {memory_blocks[block]-process_sizes[i]})")
+        else:
+            print(f"P{i+1}\t{process_sizes[i]}\tNot Allocated")
+
+if __name__ == "__main__":
+    memory_blocks = [100, 500, 200, 300, 600]   # Memory block sizes
+    process_sizes = [212, 417, 112, 426]        # Process sizes
+
+    print("Memory Blocks:", memory_blocks)
+    print("Process Sizes:", process_sizes)
+
+    ff_alloc = first_fit(memory_blocks, process_sizes)
+    bf_alloc = best_fit(memory_blocks, process_sizes)
+    wf_alloc = worst_fit(memory_blocks, process_sizes)
+
+    print_allocation("First Fit", ff_alloc, process_sizes, memory_blocks)
+    print_allocation("Best Fit", bf_alloc, process_sizes, memory_blocks)
+    print_allocation("Worst Fit", wf_alloc, process_sizes, memory_blocks)
