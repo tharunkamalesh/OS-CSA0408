@@ -1,0 +1,82 @@
+from collections import deque
+
+def round_robin(processes, quantum):
+    n = len(processes)
+
+    # Sort by arrival time
+    processes.sort(key=lambda x: x[1])
+
+    remaining_bt = [p[2] for p in processes]
+    ct = [0] * n
+    tat = [0] * n
+    wt = [0] * n
+    completed = 0
+
+    time = 0
+    queue = deque()
+    gantt_chart = []
+
+    visited = [False] * n
+    queue.append(0)
+    visited[0] = True
+
+    while completed != n:
+        if queue:
+            idx = queue.popleft()
+
+            if remaining_bt[idx] > quantum:
+                time += quantum
+                remaining_bt[idx] -= quantum
+                gantt_chart.extend([processes[idx][0]] * quantum)
+            else:
+                time += remaining_bt[idx]
+                gantt_chart.extend([processes[idx][0]] * remaining_bt[idx])
+                remaining_bt[idx] = 0
+                completed += 1
+                ct[idx] = time
+                tat[idx] = ct[idx] - processes[idx][1]
+                wt[idx] = tat[idx] - processes[idx][2]
+
+            # Add new processes that have arrived
+            for i in range(n):
+                if processes[i][1] <= time and not visited[i] and remaining_bt[i] > 0:
+                    queue.append(i)
+                    visited[i] = True
+
+            # If current process still has burst left, push it back
+            if remaining_bt[idx] > 0:
+                queue.append(idx)
+        else:
+            gantt_chart.append("Idle")
+            time += 1
+            # Add next process that arrives
+            for i in range(n):
+                if processes[i][1] <= time and not visited[i] and remaining_bt[i] > 0:
+                    queue.append(i)
+                    visited[i] = True
+
+    # Print results
+    print("\nProcess\tAT\tBT\tCT\tTAT\tWT")
+    total_tat = total_wt = 0
+    for i in range(n):
+        print(f"{processes[i][0]}\t{processes[i][1]}\t{processes[i][2]}\t{ct[i]}\t{tat[i]}\t{wt[i]}")
+        total_tat += tat[i]
+        total_wt += wt[i]
+
+    print(f"\nAverage Turnaround Time: {total_tat / n:.2f}")
+    print(f"Average Waiting Time: {total_wt / n:.2f}")
+    print(f"Gantt Chart: {gantt_chart}")
+
+
+# Example Usage
+if __name__ == "__main__":
+    # Process format: [ProcessID, ArrivalTime, BurstTime]
+    processes = [
+        ["P1", 0, 5],
+        ["P2", 1, 4],
+        ["P3", 2, 2],
+        ["P4", 3, 1]
+    ]
+    quantum = 2
+
+    round_robin(processes, quantum)
