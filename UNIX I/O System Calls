@@ -1,0 +1,21 @@
+import os
+
+# Create and write to file
+fd = os.open("file.txt", os.O_CREAT | os.O_RDWR)
+os.write(fd, b"Unix System Calls Example")
+os.lseek(fd, 0, os.SEEK_SET)  # Seek to start
+content = os.read(fd, 100)
+print("File Content:", content.decode())
+os.close(fd)
+
+# Stat
+info = os.stat("file.txt")
+print("File Size:", info.st_size)
+
+# Directory operations
+os.mkdir("test_dir")
+with os.scandir("test_dir") as entries:
+    for entry in entries:
+        print(entry.name)
+os.rmdir("test_dir")
+os.remove("file.txt")
