@@ -1,0 +1,26 @@
+import threading
+import time
+
+def task(name, delay):
+    """Function to simulate work in a thread"""
+    for i in range(3):
+        print(f"Thread {name}: Running iteration {i+1}")
+        time.sleep(delay)
+    print(f"Thread {name}: Finished execution")
+
+if __name__ == "__main__":
+    # Create threads
+    t1 = threading.Thread(target=task, args=("A", 1))
+    t2 = threading.Thread(target=task, args=("B", 2))
+
+    print("Main: Starting threads...")
+
+    # Start threads
+    t1.start()
+    t2.start()
+
+    # Wait for threads to complete
+    t1.join()
+    t2.join()
+
+    print("Main: All threads have finished.")
