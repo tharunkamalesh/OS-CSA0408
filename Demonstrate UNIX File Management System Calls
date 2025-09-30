@@ -1,0 +1,18 @@
+import os
+
+# Create a new file
+fd = os.open("sample.txt", os.O_CREAT | os.O_RDWR)
+os.write(fd, b"Hello Unix File System!")
+os.close(fd)
+
+# Rename file
+os.rename("sample.txt", "sample_renamed.txt")
+
+# Get file info
+stat_info = os.stat("sample_renamed.txt")
+print("File Size:", stat_info.st_size)
+print("Last Modified:", stat_info.st_mtime)
+
+# Delete file
+os.remove("sample_renamed.txt")
+print("File deleted.")
