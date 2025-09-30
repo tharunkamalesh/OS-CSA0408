@@ -1,0 +1,6 @@
+import os
+
+path = "."
+print("Files in directory:")
+for entry in os.listdir(path):
+    print(entry)
