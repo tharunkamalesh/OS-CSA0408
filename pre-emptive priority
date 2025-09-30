@@ -1,0 +1,68 @@
+# Pre-emptive Priority Scheduling Algorithm in Python
+
+def priority_preemptive(processes):
+    n = len(processes)
+
+    # Sort processes by arrival time
+    processes.sort(key=lambda x: x[1])
+
+    # Initialize variables
+    time = 0
+    completed = 0
+    gantt_chart = []
+    remaining_bt = [p[2] for p in processes]  # Remaining burst times
+    ct, tat, wt = [0] * n, [0] * n, [0] * n
+    is_completed = [False] * n
+
+    while completed != n:
+        # Select process with highest priority at current time
+        idx = -1
+        highest_priority = float('inf')
+
+        for i in range(n):
+            if processes[i][1] <= time and not is_completed[i]:
+                if processes[i][3] < highest_priority:
+                    highest_priority = processes[i][3]
+                    idx = i
+                elif processes[i][3] == highest_priority:
+                    if processes[i][1] < processes[idx][1]:
+                        idx = i
+
+        if idx != -1:
+            gantt_chart.append(processes[idx][0])
+            remaining_bt[idx] -= 1
+            time += 1
+
+            if remaining_bt[idx] == 0:
+                ct[idx] = time
+                tat[idx] = ct[idx] - processes[idx][1]
+                wt[idx] = tat[idx] - processes[idx][2]
+                is_completed[idx] = True
+                completed += 1
+        else:
+            time += 1  # CPU is idle
+
+    # Print results
+    print("\nProcess\tAT\tBT\tPrio\tCT\tTAT\tWT")
+    total_tat = total_wt = 0
+    for i in range(n):
+        print(f"{processes[i][0]}\t{processes[i][1]}\t{processes[i][2]}\t{processes[i][3]}\t{ct[i]}\t{tat[i]}\t{wt[i]}")
+        total_tat += tat[i]
+        total_wt += wt[i]
+
+    print(f"\nAverage Turnaround Time: {total_tat / n:.2f}")
+    print(f"Average Waiting Time: {total_wt / n:.2f}")
+    print(f"Gantt Chart: {gantt_chart}")
+
+
+# Example Usage
+if __name__ == "__main__":
+    # Process Format: [ProcessID, ArrivalTime, BurstTime, Priority]
+    processes = [
+        ["P1", 0, 7, 2],
+        ["P2", 1, 4, 1],
+        ["P3", 2, 5, 3],
+        ["P4", 3, 3, 2]
+    ]
+
+    priority_preemptive(processes)
