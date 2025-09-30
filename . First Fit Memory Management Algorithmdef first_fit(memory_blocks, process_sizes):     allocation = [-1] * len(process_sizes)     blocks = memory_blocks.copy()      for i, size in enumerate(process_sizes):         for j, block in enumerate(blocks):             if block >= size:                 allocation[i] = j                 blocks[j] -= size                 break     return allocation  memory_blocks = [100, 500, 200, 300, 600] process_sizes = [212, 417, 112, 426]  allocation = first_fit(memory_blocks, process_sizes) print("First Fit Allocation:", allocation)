@@ -1,0 +1,17 @@
+def first_fit(memory_blocks, process_sizes):
+    allocation = [-1] * len(process_sizes)
+    blocks = memory_blocks.copy()
+
+    for i, size in enumerate(process_sizes):
+        for j, block in enumerate(blocks):
+            if block >= size:
+                allocation[i] = j
+                blocks[j] -= size
+                break
+    return allocation
+
+memory_blocks = [100, 500, 200, 300, 600]
+process_sizes = [212, 417, 112, 426]
+
+allocation = first_fit(memory_blocks, process_sizes)
+print("First Fit Allocation:", allocation)
