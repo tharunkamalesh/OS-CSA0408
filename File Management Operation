@@ -1,0 +1,17 @@
+import os
+
+# Create file
+with open("file1.txt", "w") as f:
+    f.write("Hello File Management!")
+
+# Read file
+with open("file1.txt", "r") as f:
+    print(f.read())
+
+# Append file
+with open("file1.txt", "a") as f:
+    f.write("\nAppending new line.")
+
+# Delete file
+os.remove("file1.txt")
+print("File operations completed.")
