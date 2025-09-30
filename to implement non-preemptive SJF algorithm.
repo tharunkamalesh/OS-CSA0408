@@ -1,0 +1,62 @@
+def sjf_non_preemptive(processes):
+    n = len(processes)
+
+    # Sort by arrival time
+    processes.sort(key=lambda x: x[1])
+
+    time = 0
+    completed = 0
+    gantt_chart = []
+    ct, tat, wt = [0] * n, [0] * n, [0] * n
+    done = [False] * n
+
+    while completed != n:
+        idx = -1
+        min_bt = float('inf')
+
+        # Find shortest job among arrived processes
+        for i in range(n):
+            if processes[i][1] <= time and not done[i]:
+                if processes[i][2] < min_bt:
+                    min_bt = processes[i][2]
+                    idx = i
+                elif processes[i][2] == min_bt:
+                    if processes[i][1] < processes[idx][1]:
+                        idx = i  # break ties with earlier arrival
+
+        if idx != -1:
+            time += processes[idx][2]
+            ct[idx] = time
+            tat[idx] = ct[idx] - processes[idx][1]
+            wt[idx] = tat[idx] - processes[idx][2]
+
+            gantt_chart.extend([processes[idx][0]] * processes[idx][2])
+            done[idx] = True
+            completed += 1
+        else:
+            gantt_chart.append("Idle")
+            time += 1  # CPU idle
+
+    # Print results
+    print("\nProcess\tAT\tBT\tCT\tTAT\tWT")
+    total_tat = total_wt = 0
+    for i in range(n):
+        print(f"{processes[i][0]}\t{processes[i][1]}\t{processes[i][2]}\t{ct[i]}\t{tat[i]}\t{wt[i]}")
+        total_tat += tat[i]
+        total_wt += wt[i]
+
+    print(f"\nAverage Turnaround Time: {total_tat / n:.2f}")
+    print(f"Average Waiting Time: {total_wt / n:.2f}")
+    print(f"Gantt Chart: {gantt_chart}")
+
+
+# Example Usage
+if __name__ == "__main__":
+    # Process format: [ProcessID, ArrivalTime, BurstTime]
+    processes = [
+        ["P1", 0, 7],
+        ["P2", 2, 4],
+        ["P3", 4, 1]
+    ]
+
+    sjf_non_preemptive(processes)
