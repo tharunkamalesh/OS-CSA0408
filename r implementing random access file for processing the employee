@@ -1,0 +1,77 @@
+import struct
+import os
+
+# Define the format for each employee record
+# Example: ID (int), Name (20 chars), Salary (float)
+record_format = 'i20sf'
+record_size = struct.calcsize(record_format)
+file_name = "employee.dat"
+
+def add_employee(emp_id, name, salary):
+    with open(file_name, 'ab') as f:  # append in binary mode
+        name_bytes = name.encode('utf-8')[:20]  # truncate if longer than 20
+        name_bytes += b' ' * (20 - len(name_bytes))  # pad if shorter
+        f.write(struct.pack(record_format, emp_id, name_bytes, salary))
+    print(f"Employee {name} added successfully.")
+
+def display_employees():
+    if not os.path.exists(file_name):
+        print("No employee records found.")
+        return
+
+    with open(file_name, 'rb') as f:
+        print("\nEmployee Records:")
+        print("ID\tName\t\tSalary")
+        while True:
+            bytes_read = f.read(record_size)
+            if not bytes_read:
+                break
+            emp_id, name_bytes, salary = struct.unpack(record_format, bytes_read)
+            name = name_bytes.decode('utf-8').strip()
+            print(f"{emp_id}\t{name}\t{salary}")
+
+def update_employee(emp_id, new_salary):
+    if not os.path.exists(file_name):
+        print("No employee records found.")
+        return
+
+    with open(file_name, 'r+b') as f:
+        while True:
+            pos = f.tell()
+            bytes_read = f.read(record_size)
+            if not bytes_read:
+                print(f"Employee with ID {emp_id} not found.")
+                break
+            rec_id, name_bytes, salary = struct.unpack(record_format, bytes_read)
+            if rec_id == emp_id:
+                # Update salary
+                f.seek(pos)
+                f.write(struct.pack(record_format, rec_id, name_bytes, new_salary))
+                print(f"Employee ID {emp_id} salary updated to {new_salary}.")
+                break
+
+if __name__ == "__main__":
+    while True:
+        print("\nRandom Access File - Employee Menu")
+        print("1. Add Employee")
+        print("2. Display Employees")
+        print("3. Update Employee Salary")
+        print("4. Exit")
+
+        choice = input("Enter your choice: ")
+        if choice == '1':
+            emp_id = int(input("Enter Employee ID: "))
+            name = input("Enter Employee Name: ")
+            salary = float(input("Enter Salary: "))
+            add_employee(emp_id, name, salary)
+        elif choice == '2':
+            display_employees()
+        elif choice == '3':
+            emp_id = int(input("Enter Employee ID to update: "))
+            new_salary = float(input("Enter new Salary: "))
+            update_employee(emp_id, new_salary)
+        elif choice == '4':
+            print("Exiting program.")
+            break
+        else:
+            print("Invalid choice. Try again.")
