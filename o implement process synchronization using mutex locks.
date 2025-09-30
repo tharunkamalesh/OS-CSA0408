@@ -1,0 +1,36 @@
+   import threading
+import time
+import random
+
+# Shared resource
+counter = 0
+
+# Mutex lock
+mutex = threading.Lock()
+
+def increment(thread_id, num_increments=5):
+    global counter
+    for _ in range(num_increments):
+        time.sleep(random.uniform(0.1, 0.5))  # Simulate work
+
+        # Acquire mutex before entering critical section
+        mutex.acquire()
+        temp = counter
+        temp += 1
+        counter = temp
+        print(f"Thread {thread_id} incremented counter to {counter}")
+        mutex.release()  # Release mutex after leaving critical section
+
+if __name__ == "__main__":
+    # Create multiple threads
+    threads = [threading.Thread(target=increment, args=(i,)) for i in range(3)]
+
+    # Start threads
+    for t in threads:
+        t.start()
+
+    # Wait for all threads to finish
+    for t in threads:
+        t.join()
+
+    print(f"\nFinal value of counter: {counter}")
