@@ -1,0 +1,15 @@
+# fcfs_disk.py
+def fcfs_disk(requests, start):
+    order = [start] + requests[:]
+    total_movement = 0
+    for i in range(len(order)-1):
+        total_movement += abs(order[i+1] - order[i])
+    print("Service order:", order[1:])
+    return total_movement
+
+if __name__ == "__main__":
+    requests = [98, 183, 37, 122, 14, 124, 65, 67]
+    start = 53
+    movement = fcfs_disk(requests, start)
+    print("Total head movement:", movement)
+  
