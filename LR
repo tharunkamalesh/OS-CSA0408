@@ -1,0 +1,26 @@
+# lru_paging.py
+def lru_paging(reference_string, frames_count):
+    frames = []
+    page_faults = 0
+    # Keep a list to track recent usage order: most recent at end.
+    for page in reference_string:
+        if page in frames:
+            # mark as most recently used: move to end of usage order
+            frames.remove(page)
+            frames.append(page)
+        else:
+            page_faults += 1
+            if len(frames) < frames_count:
+                frames.append(page)
+            else:
+                # remove least recently used (front)
+                frames.pop(0)
+                frames.append(page)
+        print(f"Request {page}: Frames -> {frames}")
+    return page_faults
+
+if __name__ == "__main__":
+    ref = [7, 0, 1, 2, 0, 3, 0, 4, 2, 3, 0, 3, 2]
+    frames = 3
+    faults = lru_paging(ref, frames)
+    print(f"\nTotal page faults: {faults}")
