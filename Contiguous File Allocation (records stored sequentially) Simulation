@@ -1,0 +1,27 @@
+# contiguous_allocation.py
+class ContiguousFile:
+    def __init__(self, start_index, length, storage):
+        self.start = start_index
+        self.length = length
+        self.storage = storage  # reference to shared storage list
+
+    def read_record(self, record_index):
+        """Accessing record i requires reading all previous records in the file."""
+        if record_index < 0 or record_index >= self.length:
+            raise IndexError("Record out of range")
+        start = self.start
+        # simulate reading sequentially (return the list of records read)
+        read_sequence = []
+        for i in range(record_index + 1):
+            read_sequence.append(self.storage[start + i])
+        return read_sequence
+
+if __name__ == "__main__":
+    # simulate disk as a list of record values
+    disk = ["R0","R1","R2","R3","R4","R5","R6","R7","R8","R9"]
+    # allocate file at start=2 with length 4 (records R2..R5)
+    f = ContiguousFile(start_index=2, length=4, storage=disk)
+    # read record 2 (zero-based within file -> third record)
+    seq = f.read_record(2)
+    print("Records read (to reach requested):", seq)
+  
