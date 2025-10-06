@@ -1,0 +1,30 @@
+# linux_permissions.py
+def octal_to_rwx(octal_mode):
+    """Convert integer or string octal like 754 to 'rwxr-xr--'"""
+    s = str(octal_mode)
+    if len(s) != 3:
+        raise ValueError("Provide a 3-digit octal like 754")
+    perms = []
+    mapping = [(4, 'r'), (2, 'w'), (1, 'x')]
+    for ch in s:
+        val = int(ch)
+        for bit, char in mapping:
+            perms.append(char if val & bit else '-')
+    return ''.join(perms)
+
+def rwx_to_octal(rwx):
+    """Convert 'rwxr-xr--' -> '754'"""
+    if len(rwx) != 9:
+        raise ValueError("Provide a 9-char permission string")
+    result = []
+    for i in range(0,9,3):
+        val = 0
+        val += 4 if rwx[i] == 'r' else 0
+        val += 2 if rwx[i+1] == 'w' else 0
+        val += 1 if rwx[i+2] == 'x' else 0
+        result.append(str(val))
+    return ''.join(result)
+
+if __name__ == "__main__":
+    print("754 ->", octal_to_rwx(754))     # rwxr-xr--
+    print("rwxr-xr-- ->", rwx_to_octal("rwxr-xr--"))
