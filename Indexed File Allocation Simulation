@@ -1,0 +1,35 @@
+# indexed_allocation.py
+class IndexedFile:
+    def __init__(self, index_block, blocks_storage):
+        """
+        index_block: list of block indices (each points to a block in blocks_storage)
+        blocks_storage: dict mapping block index -> list of records (or block content)
+        """
+        self.index_block = index_block
+        self.blocks_storage = blocks_storage
+
+    def read_record(self, i):
+        block_idx = i // BLOCK_SIZE
+        offset = i % BLOCK_SIZE
+        if block_idx >= len(self.index_block):
+            raise IndexError("Record out of range")
+        block_no = self.index_block[block_idx]
+        block = self.blocks_storage.get(block_no)
+        if block is None or offset >= len(block):
+            raise IndexError("Record out of block range")
+        return block[offset]
+
+# parameters
+BLOCK_SIZE = 2
+
+if __name__ == "__main__":
+    # blocks storage: block_number -> list of records
+    blocks = {
+        10: ["A0", "A1"],
+        11: ["A2", "A3"],
+        12: ["A4", "A5"],
+    }
+    index_block = [10, 11, 12]  # i-th index points to i-th block of file
+    f = IndexedFile(index_block, blocks)
+    # read record 3 -> block 1 offset 1 -> "A3"
+    print("Record 3:", f.read_record(3))
