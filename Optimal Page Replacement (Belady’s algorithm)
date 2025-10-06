@@ -1,0 +1,37 @@
+# optimal_paging.py
+def optimal_paging(reference_string, frames_count):
+    frames = []
+    page_faults = 0
+
+    for i, page in enumerate(reference_string):
+        if page in frames:
+            pass
+        else:
+            page_faults += 1
+            if len(frames) < frames_count:
+                frames.append(page)
+            else:
+                # find which page in frames is not used for the longest time in future
+                farthest_index = -1
+                page_to_replace = None
+                for f in frames:
+                    try:
+                        next_use = reference_string.index(f, i+1)
+                    except ValueError:
+                        # f is not used again -> best to replace
+                        page_to_replace = f
+                        break
+                    if next_use > farthest_index:
+                        farthest_index = next_use
+                        page_to_replace = f
+                # replace page_to_replace with current page
+                idx = frames.index(page_to_replace)
+                frames[idx] = page
+        print(f"Request {page}: Frames -> {frames}")
+    return page_faults
+
+if __name__ == "__main__":
+    ref = [7, 0, 1, 2, 0, 3, 0, 4, 2, 3, 0, 3, 2]
+    frames = 3
+    faults = optimal_paging(ref, frames)
+    print(f"\nTotal page faults: {faults}")
