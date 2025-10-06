@@ -1,0 +1,23 @@
+# fifo_paging.py
+def fifo_paging(reference_string, frames_count):
+    frames = []
+    page_faults = 0
+    pointer = 0  # points to next frame to replace
+
+    for page in reference_string:
+        if page not in frames:
+            page_faults += 1
+            if len(frames) < frames_count:
+                frames.append(page)
+            else:
+                frames[pointer] = page
+                pointer = (pointer + 1) % frames_count
+        # print current frames state (optional)
+        print(f"Request {page}: Frames -> {frames}")
+    return page_faults
+
+if __name__ == "__main__":
+    ref = [7, 0, 1, 2, 0, 3, 0, 4, 2, 3, 0, 3, 2]
+    frames = 3
+    faults = fifo_paging(ref, frames)
+    print(f"\nTotal page faults: {faults}")
