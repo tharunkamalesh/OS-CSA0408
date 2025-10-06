@@ -1,0 +1,46 @@
+\# scan_disk.py
+def scan_disk(requests, start, disk_size, direction="up"):
+    """
+    direction: "up" means towards higher track numbers first; "down" otherwise.
+    disk_size: max track number (assume tracks 0..disk_size-1)
+    """
+    left = [r for r in requests if r < start]
+    right = [r for r in requests if r >= start]
+    left.sort()
+    right.sort()
+    order = []
+    total = 0
+    cur = start
+
+    if direction == "up":
+        for r in right:
+            order.append(r)
+            total += abs(r - cur); cur = r
+        # go to end
+        if cur != disk_size - 1:
+            total += abs((disk_size - 1) - cur)
+            cur = disk_size - 1
+        # then service left in reverse
+        for r in reversed(left):
+            order.append(r)
+            total += abs(r - cur); cur = r
+    else:
+        for r in reversed(left):
+            order.append(r)
+            total += abs(r - cur); cur = r
+        if cur != 0:
+            total += abs(cur - 0); cur = 0
+        for r in right:
+            order.append(r)
+            total += abs(r - cur); cur = r
+
+    print("Service order:", order)
+    return total
+
+if __name__ == "__main__":
+    reqs = [95, 180, 34, 119, 11, 123, 62, 64]
+    start = 50
+    disk_max = 200
+    movement = scan_disk(reqs, start, disk_max, direction="up")
+    print("Total head movement:", movement)
+
