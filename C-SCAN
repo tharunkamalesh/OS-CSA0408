@@ -1,0 +1,49 @@
+# cscan_disk.py
+def cscan_disk(requests, start, disk_size, direction="up"):
+    left = [r for r in requests if r < start]
+    right = [r for r in requests if r >= start]
+    left.sort()
+    right.sort()
+    order = []
+    total = 0
+    cur = start
+
+    if direction == "up":
+        # service right upwards
+        for r in right:
+            order.append(r)
+            total += abs(r - cur); cur = r
+        # jump to beginning (circular) without servicing in between
+        if cur != disk_size - 1:
+            total += abs((disk_size - 1) - cur)
+            cur = disk_size - 1
+        # move from end -> start (we count the wrap-around movement)
+        # In C-SCAN usually the wrap movement is considered as moving to 0
+        total += disk_size - 1  # from last to 0 (counting movement)
+        cur = 0
+        for r in left:
+            order.append(r)
+            total += abs(r - cur); cur = r
+    else:
+        # reverse direction: service left downward
+        for r in reversed(left):
+            order.append(r)
+            total += abs(r - cur); cur = r
+        if cur != 0:
+            total += cur  # move to 0
+            cur = 0
+        total += disk_size - 1  # wrap from 0 to last
+        cur = disk_size - 1
+        for r in reversed(right):
+            order.append(r)
+            total += abs(r - cur); cur = r
+
+    print("Service order:", order)
+    return total
+
+if __name__ == "__main__":
+    reqs = [95, 180, 34, 119, 11, 123, 62, 64]
+    start = 50
+    disk_max = 200
+    movement = cscan_disk(reqs, start, disk_max, direction="up")
+    print("Total head movement:", movement)
